@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: myrootpassword
+      MYSQL_DATABASE: log_database
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  api:
+    build: ./database
+    container_name: node_api
+    restart: always
+    ports:
+      - "3350:3350"
+    depends_on:
+      - mysql
+    env_file:
+      - ./database/.env
+    command: npm start
+    
+volumes:
+  mysql_data:
+  

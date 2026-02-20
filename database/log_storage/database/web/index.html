@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SQL UI</title>
+    <style>
+        body { font-family: Arial; padding: 30px; }
+        textarea { width: 100%; height: 120px; }
+        button { padding: 10px 20px; margin-top: 10px; }
+        .ok { color: green; }
+        .err { color: red; }
+        pre { background: #f5f5f5; padding: 10px; }
+        #color-box {
+                        position: fixed;
+                        top: 10px;
+                        right: 10px;
+                        padding: 8px;
+                        border-radius: 8px;
+                        font-size: 12px;
+                        z-index: 1000;
+                    }
+    </style>
+</head>
+<body>
+    <h2>MySQL Execute</h2>
+    <h4>Current Database: <span id="current-db">(none)</span></h4>
+
+    <h4>Tables:</h4> 
+    <ul id="tables-list"></ul>
+    <h3>
+        เขียนคำสั่ง SQL ใส่ช่องด้านล่างแล้ว Run ได้เลย..ไม่รู้คำสั่ง? ก็ลองไปถามChat สิ"
+    </h3>
+
+    <textarea id="sql" placeholder="Type SQL here..."></textarea><br>
+    <button onclick="runSQL()">Run</button>
+
+    <p id="result" class="ok"></p>
+    <p id="error" class="err"></p>
+
+    <div id="rows-section" style="display:none;">
+        <h4>Result:</h4>
+        <pre id="rows"></pre>
+    </div>
+    <div id="color-box">
+        <input type="color" id="bgColor" onchange="changeBG(this.value)">
+    </div>
+<script>
+
+async function loadCurrentDB() {
+    try {
+        const res = await fetch("/current-db")
+        const data = await res.json()
+
+        document.getElementById("current-db").textContent =
+            data.database || "(none)"
+    } catch (err) {
+        document.getElementById("current-db").textContent = "(error)"
+    }
+}
+
+async function runSQL() {
+    const sql = document.getElementById("sql").value
+
+    document.getElementById("result").textContent = ""
+    document.getElementById("error").textContent = ""
+    document.getElementById("rows-section").style.display = "none"
+
+    try {
+        const res = await fetch("/query", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sql })
+        })
+
+        const data = await res.json()
+
+        if (data.error) {
+            document.getElementById("error").textContent = "❌ " + data.error
+        } else {
+            document.getElementById("result").textContent = "✅ " + data.result
+            await loadCurrentDB()
+            await loadTables()
+            if (data.rows) {
+                document.getElementById("rows").textContent =
+                    JSON.stringify(data.rows, null, 2)
+                document.getElementById("rows-section").style.display = "block"
+            }
+        }
+    } catch (err) {
+        document.getElementById("error").textContent = err.message
+    }
+}
+
+async function loadTables() {
+    try {
+        const res = await fetch("/tables")
+        const data = await res.json()
+
+        const list = document.getElementById("tables-list")
+        list.innerHTML = ""
+
+        if (data.tables && data.tables.length > 0) {
+            data.tables.forEach(t => {
+                const li = document.createElement("li")
+                li.textContent = t
+                list.appendChild(li)
+            })
+        } else {
+            list.innerHTML = "<li>(no tables)</li>"
+        }
+    } catch (err) {
+        document.getElementById("tables-list").innerHTML =
+            "<li>(error loading tables)</li>"
+    }
+}
+window.onload = async () => {
+    await loadCurrentDB()
+    await loadTables()
+}
+
+function changeBG(color) {
+    document.body.style.backgroundColor = color
+    localStorage.setItem("bgColor", color)
+}
+
+window.addEventListener("load", () => {
+    const savedColor = localStorage.getItem("bgColor")
+    if (savedColor) {
+        document.body.style.backgroundColor = savedColor
+        document.getElementById("bgColor").value = savedColor
+    }
+})
+</script>
+
+</body>
+</html>
