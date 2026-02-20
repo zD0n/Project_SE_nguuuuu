@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Guard AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #27ae60;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+        }
+        body { font-family: 'Sarabun', sans-serif; background: #f4f6f7; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        
+        .container { 
+            background: white; width: 100%; max-width: 480px; 
+            padding: 25px; border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; 
+        }
+
+        h2 { color: var(--primary); margin: 0 0 5px 0; }
+        p { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px; }
+
+        .preview-box {
+            width: 100%; height: 300px;
+            background: #f8f9fa; border: 2px dashed #bdc3c7; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; position: relative; margin-bottom: 20px;
+        }
+        
+        #imagePreview, #videoPreview {
+            width: 100%; height: 100%; object-fit: cover; display: none;
+        }
+        
+        .placeholder-text { color: #bdc3c7; font-weight: bold; }
+
+        .input-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        
+        .btn-icon {
+            flex: 1; padding: 12px; border: 1px solid #dfe6e9; border-radius: 8px;
+            background: white; cursor: pointer; color: var(--dark); font-weight: bold;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .btn-icon:hover { background: #f1f2f6; border-color: var(--primary); color: var(--primary); }
+        .btn-icon.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .btn-scan {
+            width: 100%; padding: 15px; border: none; border-radius: 10px;
+            background: var(--dark); color: white; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn-scan:disabled { background: #95a5a6; cursor: not-allowed; }
+        .btn-scan:hover:not(:disabled) { background: var(--primary); transform: translateY(-2px); }
+
+        .result-card { 
+            margin-top: 20px; padding: 20px; border-radius: 10px; 
+            background: #e8f8f5; border-left: 5px solid var(--primary);
+            text-align: left; display: none; 
+        }
+        .danger-high { color: var(--danger); font-weight: bold; }
+
+        .loader { display: none; width: 24px; height: 24px; border: 3px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Snake Guard AI</h2>
+    <p>ถ่ายรูปหรืออัปโหลดเพื่อระบุชนิดงู</p>
+
+    <div class="preview-box">
+        <span class="placeholder-text" id="placeholder">เลือกรูป หรือ เปิดกล้อง</span>
+        <img id="imagePreview" alt="Preview">
+        <video id="videoPreview" autoplay playsinline></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+
+    <div class="input-group">
+        <button class="btn-icon" onclick="document.getElementById('fileInput').click()">
+            📁 เลือกรูป
+        </button>
+        <input type="file" id="fileInput" accept="image/*" hidden onchange="handleFileSelect(this)">
+        
+        <button class="btn-icon" id="btnCamera" onclick="toggleCamera()">
+            📷 เปิดกล้อง
+        </button>
+    </div>
+
+    <button class="btn-scan" id="btnScan" onclick="handleSmartScan()">
+        <span id="btnText">Scan Now</span>
+        <div class="loader" id="loader"></div>
+    </button>
+
+    <div class="result-card" id="resultBox">
+        <h3 id="resSnake" style="margin: 0 0 10px 0; color: #2c3e50;"></h3>
+        <div><b>ชื่อไทย:</b> <span id="resThai">-</span></div>
+        <div><b>ความมั่นใจ:</b> <span id="resConf">-</span></div>
+        <div><b>ระดับอันตราย:</b> <span id="resDanger">-</span></div>
+        <div style="margin-top: 5px;"><b>ปฐมพยาบาล:</b> <span id="resAid">-</span></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
