@@ -4,7 +4,7 @@ This repository is part of a Software Engineering (SE) course project.
 
 **Project Name:** SnakeGuard
 
-![SnakeGuard Logo](images/logo.png)
+![SnakeGuard Logo](logo/logo.png)
 
 ---
 
