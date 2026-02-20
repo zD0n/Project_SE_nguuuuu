@@ -1,0 +1,50 @@
+[
+  {
+    "scientific_name": "Ophiophagus hannah",
+    "thai_name": "งูจงอาง",
+    "group": "deadly",
+    "symptoms": "พิษต่อระบบประสาท หนังตาตก กล้ามเนื้ออ่อนแรง หยุดหายใจ",
+    "habitat": "ป่า เขตป่าชายชุมชน ทั่วประเทศ",
+    "first_aid": "ดามอวัยวะ ห้ามขยับ รีบนำส่งโรงพยาบาล ให้เซรุ่ม"
+  },
+  {
+    "scientific_name": "Naja naja",
+    "thai_name": "งูเห่า",
+    "group": "deadly",
+    "symptoms": "พิษประสาทและทำลายเนื้อเยื่อ หายใจลำบาก แผลบวม เนื้อตาย",
+    "habitat": "นา สวน หมู่บ้าน",
+    "first_aid": "ล้างแผล ดามอวัยวะ รีบไปโรงพยาบาล"
+  },
+  {
+    "scientific_name": "Daboia russelii",
+    "thai_name": "งูแมวเซา",
+    "group": "deadly",
+    "symptoms": "พิษต่อระบบเลือด ปวดบวมมาก เลือดออกไม่หยุด ไตวาย",
+    "habitat": "ทุ่งนา พื้นที่เกษตร",
+    "first_aid": "ดามอวัยวะ รีบไปโรงพยาบาล ตรวจเลือด"
+  },
+  {
+    "scientific_name": "Bungarus multicinctus",
+    "thai_name": "งูทับสมิงคลา",
+    "group": "deadly",
+    "symptoms": "พิษประสาทรุนแรง แผลไม่เจ็บแต่หยุดหายใจ",
+    "habitat": "ใกล้บ้าน ใต้ถุน ออกหากินกลางคืน",
+    "first_aid": "รีบไปโรงพยาบาลทันที เฝ้าระวังการหายใจ"
+  },
+  {
+    "scientific_name": "Trimeresurus stejnegeri",
+    "thai_name": "งูเขียวหางไหม้ท้องเหลือง",
+    "group": "deadly",
+    "symptoms": "พิษต่อเลือด ปวดบวม เลือดแข็งตัวผิดปกติ",
+    "habitat": "สวน ป่าละเมาะ ใกล้บ้าน",
+    "first_aid": "ล้างแผล ดามอวัยวะ ไปโรงพยาบาล"
+  },
+  {
+    "scientific_name": "Laticauda colubrina",
+    "thai_name": "งูสมิงทะเลปากเหลือง",
+    "group": "deadly",
+    "symptoms": "พิษกล้ามเนื้อ ปวดกล้ามเนื้อ ปัสสาวะสีเข้ม ไตวาย",
+    "habitat": "ชายฝั่งทะเล แนวปะการัง",
+    "first_aid": "รีบส่งโรงพยาบาล เฝ้าระวังไต"
+  }
+]
