@@ -1,5 +1,10 @@
 flask
+gunicorn
 torch
 torchvision
 pillow
 requests
+numpy
+opencv-python-headless
+rfdetr
+gdown

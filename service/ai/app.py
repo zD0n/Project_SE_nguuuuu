@@ -1,7 +1,9 @@
 import io
 import torch
+import os
 from flask import Flask, request, jsonify
 from PIL import Image
+import gdown
 from rfdetr import RFDETRMedium
 
 app = Flask(__name__)
@@ -17,7 +19,8 @@ CLASS_ID_MAP = {
 SORTED_IDS = sorted(CLASS_ID_MAP.keys())
 CLASS_NAMES_LIST = [CLASS_ID_MAP[k] for k in SORTED_IDS]
 
-MODEL_PATH = r"C:\Users\kzee8\OneDrive\เอกสาร\GitHub\Project_SE_nguuuuu\service\ai\model\checkpoint_best_ema.pth"
+MODEL_PATH = r"./model/checkpoint_best_ema.pth"
+
 device = 'cpu'
 model = RFDETRMedium(pretrain_weights=MODEL_PATH, num_classes=len(CLASS_NAMES_LIST), device=device)
 
