@@ -9,11 +9,13 @@ app.use(cors())
 app.use(express.json())
 app.use(express.static(path.join(__dirname, "web")))
 
+const currentDatabase = process.env.DB_NAME
+
 const db = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  database: currentDatabase,
   port: process.env.DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
@@ -29,7 +31,7 @@ app.get("/health", async (req, res) => {
 })
 
 app.get("/current-db", async (req, res) => {
-  res.json({ database: process.env.DB_NAME })
+  res.json({ database: currentDatabase })
 })
 
 app.get("/tables", async (req, res) => {
@@ -72,6 +74,21 @@ app.post("/log", async (req, res) => {
   }
 })
 
+app.get("/summary", async (req, res) => {
+  const conn = await db.getConnection()
+  try {
+    await conn.query(`USE ${currentDatabase}`)
+    const [rows] = await conn.query("SELECT * FROM log;")
+
+    const tables = rows.map(row => Object.values(row)[0])
+
+    res.json({ tables })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  } finally {
+    conn.release()
+  }
+})
 
 app.post("/query", async (req, res) => {
   const { sql } = req.body
