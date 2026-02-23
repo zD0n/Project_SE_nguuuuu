@@ -1,0 +1,4 @@
+services:
+  aii:
+    build: .
+    container_name: testssd

@@ -1,10 +1,9 @@
 flask
 gunicorn
-torch
-torchvision
 pillow
 requests
 numpy
-opencv-python-headless
 rfdetr
 gdown
+opencv-python-headless
+supervision
