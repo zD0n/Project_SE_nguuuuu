@@ -14,7 +14,7 @@ services:
     env_file:
       - .env
     environment:
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=mongodb://${MONGO_ROOT_NAME}:${MONGO_ROOT_PASS}@mongo:27017/image_db?authSource=admin
     depends_on:
       - mongo
     ports:

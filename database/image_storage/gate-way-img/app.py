@@ -11,8 +11,7 @@ ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = os.environ["MONGO_URI"]
-print(app.config["MONGO_URI"])
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 mongo = PyMongo(app)
 
 
@@ -87,7 +86,7 @@ def upload_image():
 
 # ---------- 3) Get base64 back ----------
 @api.get("/images/<id>")
-def get_image_base64(image_id: str):
+def get_image_base64(id: str):
     try:
         oid = ObjectId(id)
     except Exception:
