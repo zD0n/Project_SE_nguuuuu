@@ -3,7 +3,7 @@ gunicorn==21.2.0
 Pillow==10.3.0
 requests==2.31.0
 numpy==1.26.4
-rfdetr==0.1.1
+rfdetr==1.5.1
 gdown==5.1.0
 opencv-python-headless==4.9.0.80
 supervision==0.21.0

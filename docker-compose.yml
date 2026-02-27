@@ -5,26 +5,8 @@ include:
   - path: service/frontend/docker-compose.yml
   - path: database/image_storage/docker-compose.yml
   - path: database/log_storage/docker-compose.yml
-
-services:
-  wiki-mysql:
-    image: mysql:8.0
-    container_name: wiki-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: wiki_snake_storage
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASS}
-    volumes:
-      - wiki_mysql_data:/var/lib/mysql
-      - ./database/wiki_snake_storage/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - snake-net
-
+  - path: database/wiki_snake_storage/docker-compose.yml
 networks:
   snake-net:
     name: snake-net
     driver: bridge
-
-volumes:
-  wiki_mysql_data:
