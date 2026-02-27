@@ -23,6 +23,8 @@ services:
       - mongo
     ports:
       - "5002:5002"
+    volumes:
+      - image_uploads:/app/uploads
     networks:
       - snake-net
 
@@ -33,3 +35,4 @@ networks:
 
 volumes:
   mongo_data:
+  image_uploads:

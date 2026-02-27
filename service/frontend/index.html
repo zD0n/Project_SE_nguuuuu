@@ -63,6 +63,11 @@
 
         .loader { display: none; width: 24px; height: 24px; border: 3px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Custom Autocomplete Dropdown */
+        .suggestion-item { cursor: pointer; transition: background 0.2s, color 0.2s; }
+        .suggestion-item:hover { background-color: #27ae60; color: white; }
+        .suggestion-highlight { background-color: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -70,6 +75,13 @@
 <div class="container">
     <h2>Snake Guard AI</h2>
     <p>ถ่ายรูปหรืออัปโหลดเพื่อระบุชนิดงู</p>
+
+    <div style="margin-bottom: 15px;">
+        <input type="text" id="search-snake" list="snake-suggestions" 
+               placeholder="พิมพ์ชื่องูที่นี่..." 
+               style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; box-sizing: border-box;">
+        <datalist id="snake-suggestions"></datalist>
+    </div>
 
     <div class="preview-box">
         <span class="placeholder-text" id="placeholder">เลือกรูป หรือ เปิดกล้อง</span>
@@ -97,9 +109,16 @@
     <div class="result-card" id="resultBox">
         <h3 id="resSnake" style="margin: 0 0 10px 0; color: #2c3e50;"></h3>
         <div><b>ชื่อไทย:</b> <span id="resThai">-</span></div>
-        <div><b>ความมั่นใจ:</b> <span id="resConf">-</span></div>
+        <div><b>ความมั่นใจของ AI:</b> <span id="resConf">-</span></div>
         <div><b>ระดับอันตราย:</b> <span id="resDanger">-</span></div>
         <div style="margin-top: 5px;"><b>ปฐมพยาบาล:</b> <span id="resAid">-</span></div>
+        <div style="margin-top: 5px;"><b>ลักษณะทางกายภาพ:</b> <span id="resMorphology">-</span></div>
+        <div id="resWarning" style="margin-top: 10px; color: var(--danger); font-weight: bold; display: none;"></div>
+        
+        <div id="feedbackSection" style="margin-top: 15px; display: none; border-top: 1px solid #ccc; padding-top: 15px;">
+            <textarea id="feedbackText" rows="3" placeholder="AI ทายถูกไหม? หรือมีข้อเสนอแนะอะไรให้เว็บเราบ้าง?" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; resize: none;"></textarea>
+            <button onclick="submitFeedback()" style="margin-top: 8px; padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">ส่งข้อเสนอแนะ</button>
+        </div>
     </div>
 </div>
 

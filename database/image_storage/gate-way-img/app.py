@@ -8,6 +8,7 @@ from bson import ObjectId
 
 # ---------- Config ----------
 ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp"}
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
 
 app = Flask(__name__)
@@ -63,6 +64,9 @@ def upload_image():
     raw = f.read()
     if not raw:
         return jsonify({"error": "empty file content"}), 400
+    
+    if len(raw) > MAX_FILE_SIZE:
+        return jsonify({"error": f"file too large. max {MAX_FILE_SIZE // (1024*1024)}MB"}), 413
 
     b64 = bytes_to_base64(raw)
 
@@ -74,9 +78,11 @@ def upload_image():
     }
 
     res = mongo.db.images.insert_one(doc)
+    mongo_id = str(res.inserted_id)
     return jsonify(
         {
-            "id": str(res.inserted_id),
+            "id": mongo_id,
+            "mongo_id": mongo_id,
             "filename": doc["filename"],
             "content_type": doc["content_type"],
             "get_url": f"/api/images/{res.inserted_id}",

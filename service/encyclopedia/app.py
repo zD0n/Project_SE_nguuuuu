@@ -24,13 +24,13 @@ def info(name):
     sql = """
       SELECT *
       FROM snakes
-      WHERE name_en = %s OR name_th = %s OR short_name = %s
+      WHERE name_en = %s OR name_th = %s OR short_name = %s OR scientific_name = %s
       LIMIT 1
     """
     conn = get_conn()
     try:
         with conn.cursor() as cur:
-            cur.execute(sql, (q, q, q))
+            cur.execute(sql, (q, q, q, q))
             row = cur.fetchone()
     finally:
         conn.close()
@@ -62,6 +62,32 @@ def search():
         conn.close()
 
     return jsonify({"items": rows, "total": len(rows), "query": q}), 200
+
+@app.get("/suggest")
+def suggest():
+    q = request.args.get("q", "").strip()
+    limit = min(int(request.args.get("limit", 5)), 10)
+    
+    if not q or len(q) < 1:
+        return jsonify({"suggestions": []}), 200
+    
+    prefix = f"{q}%"
+    sql = """
+      SELECT DISTINCT name_th, scientific_name
+      FROM snakes
+      WHERE name_th LIKE %s OR scientific_name LIKE %s
+      LIMIT %s
+    """
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (prefix, prefix, limit))
+            rows = cur.fetchall()
+    finally:
+        conn.close()
+
+    suggestions = [row.get("name_th") or row.get("scientific_name") for row in rows if row.get("name_th") or row.get("scientific_name")]
+    return jsonify({"suggestions": suggestions, "query": q}), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

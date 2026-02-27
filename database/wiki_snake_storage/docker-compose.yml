@@ -9,10 +9,9 @@ services:
       MYSQL_USER: ${DB_USER:-wiki}
       MYSQL_PASSWORD: ${DB_PASS:-wiki}
     ports:
-      - "3306:3306"
+      - "3308:3306"
     volumes:
       - wiki_mysql_data:/var/lib/mysql
-      # โหลดไฟล์ SQL ตั้งต้นตามที่เพื่อนคุณทำไว้
       - ./init.sql:/docker-entrypoint-initdb.d/1-init.sql
       - ./seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
       - ./dataset:/var/lib/mysql-files/
