@@ -46,6 +46,7 @@ def health():
 
 
 # ---------- 2) Upload image -> base64 -> MongoDB ----------
+@app.post("/upload")
 @api.post("/upload")
 def upload_image():
     # ใช้ request.files สำหรับรับไฟล์ :contentReference[oaicite:7]{index=7}
@@ -80,6 +81,7 @@ def upload_image():
             "content_type": doc["content_type"],
             "base64": b64,  # "พร้อมส่งกลับ" ตามที่ขอ
             "get_url": f"/api/images/{res.inserted_id}",
+            "url": f"/api/images/{res.inserted_id}",
         }
     ), 201
 
@@ -102,7 +104,7 @@ def get_image_base64(id: str):
             "id": str(doc["_id"]),
             "filename": doc.get("filename"),
             "content_type": doc.get("content_type"),
-            "base64": doc.get("data_base64"),
+            "base64": doc.get("base64"),
             "created_at": doc.get("created_at").isoformat()
             if doc.get("created_at")
             else None,
@@ -113,4 +115,5 @@ def get_image_base64(id: str):
 app.register_blueprint(api)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.getenv("PORT", "5002"))
+    app.run(host="0.0.0.0", port=port, debug=True)

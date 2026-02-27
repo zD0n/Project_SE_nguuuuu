@@ -18,7 +18,7 @@ services:
     depends_on:
       - mongo
     ports:
-      - ${API_MONGO_PORT}
+      - "5002:5002"
 
 volumes:
   mongo_data:
