@@ -79,7 +79,6 @@ def upload_image():
             "id": str(res.inserted_id),
             "filename": doc["filename"],
             "content_type": doc["content_type"],
-            "base64": b64,  # "พร้อมส่งกลับ" ตามที่ขอ
             "get_url": f"/api/images/{res.inserted_id}",
             "url": f"/api/images/{res.inserted_id}",
         }
@@ -116,4 +115,4 @@ app.register_blueprint(api)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5002"))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)

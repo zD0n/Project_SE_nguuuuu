@@ -8,6 +8,10 @@ from rfdetr import RFDETRMedium
 
 app = Flask(__name__)
 
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({"status": "ok"}), 200
+
 CLASS_ID_MAP = {
     25: "Vine Snake", 26: "Whip Snake", 99: "Krait", 135: "Golden Tree", 
     203: "Russell Viper", 215: "Painted Bronzeback", 302: "Red-tailed Racer", 
@@ -19,7 +23,7 @@ CLASS_ID_MAP = {
 SORTED_IDS = sorted(CLASS_ID_MAP.keys())
 CLASS_NAMES_LIST = [CLASS_ID_MAP[k] for k in SORTED_IDS]
 
-MODEL_PATH = r"./model/checkpoint_best_ema.pth"
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model", "checkpoint_best_ema.pth")
 
 device = 'cpu'
 model = RFDETRMedium(pretrain_weights=MODEL_PATH, num_classes=len(CLASS_NAMES_LIST), device=device)

@@ -51,20 +51,25 @@ app.get("/tables", async (req, res) => {
 })
 
 app.post("/log", async (req, res) => {
-  const { sql } = req.body
-  if (!sql) return res.status(400).json({ error: "SQL is required" })
+  const { snake_found, confidence, image_url } = req.body
+  
+  if (!snake_found) {
+    return res.status(400).json({ error: "snake_found is required" })
+  }
 
   const conn = await db.getConnection()
 
   try {
     await conn.query(`USE ${currentDatabase}`)
 
-    const [result] = await conn.query(sql)
+    const [result] = await conn.query(
+      "INSERT INTO log (snake_found, confidence, image_url, created_at) VALUES (?, ?, ?, NOW())",
+      [snake_found, confidence || null, image_url || null]
+    )
 
     res.json({
-      result: "executed successfully",
-      affectedRows: result.affectedRows || 0,
-      insertId: result.insertId || null
+      result: "logged successfully",
+      id: result.insertId
     })
 
   } catch (err) {
@@ -78,56 +83,9 @@ app.get("/summary", async (req, res) => {
   const conn = await db.getConnection()
   try {
     await conn.query(`USE ${currentDatabase}`)
-    const [rows] = await conn.query("SELECT * FROM log;")
+    const [rows] = await conn.query("SELECT * FROM log ORDER BY created_at DESC LIMIT 100")
 
-    const tables = rows.map(row => Object.values(row)[0])
-
-    res.json({ tables })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  } finally {
-    conn.release()
-  }
-})
-
-app.post("/query", async (req, res) => {
-  const { sql } = req.body
-  if (!sql) return res.status(400).json({ error: "SQL is required" })
-
-  const conn = await db.getConnection()
-
-  try {
-    await conn.query(`USE ${currentDatabase}`)
-
-    const statements = sql
-      .split(";")
-      .map(s => s.trim())
-      .filter(s => s.length > 0)
-
-    let lastRows = null
-    let message = ""
-
-    for (const stmt of statements) {
-      const [rows] = await conn.query(stmt)
-
-      const useMatch = stmt.match(/^USE\s+([a-zA-Z0-9_]+)/i)
-      if (useMatch) {
-        currentDatabase = useMatch[1]
-      }
-
-      if (Array.isArray(rows)) {
-        lastRows = rows
-        message = `${rows.length} row(s) returned`
-      } else {
-        message = "executed successfully"
-      }
-    }
-
-    res.json({
-      result: message,
-      rows: lastRows
-    })
-
+    res.json({ logs: rows, count: rows.length })
   } catch (err) {
     res.status(500).json({ error: err.message })
   } finally {
@@ -136,4 +94,5 @@ app.post("/query", async (req, res) => {
 })
 
 const PORT = process.env.PORT || 3350
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+const HOST = process.env.HOST || "0.0.0.0"
+app.listen(PORT, HOST, () => console.log(`Server running on ${HOST}:${PORT}`))

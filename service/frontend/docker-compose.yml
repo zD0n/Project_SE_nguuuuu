@@ -1,9 +1,9 @@
 services:
-  ai-service:
+  frontend:
     build: .
-    container_name: ai-service
+    container_name: frontend
     ports:
-      - "5001:5001"
+      - "8080:80"
     networks:
       - snake-net
 

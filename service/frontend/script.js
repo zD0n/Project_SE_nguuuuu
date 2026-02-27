@@ -149,14 +149,14 @@ async function sendToGateway(bytes) {
         const data = await response.json();
         
         if (data.status === 'success') {
-            document.getElementById('resSnake').innerText = data.prediction.class_name;
-            document.getElementById('resThai').innerText = data.info.thai;
-            document.getElementById('resConf').innerText = (data.prediction.confidence * 100).toFixed(1) + "%";
-            document.getElementById('resDanger').innerText = data.info.danger;
-            document.getElementById('resAid').innerText = data.info.aid;
+            document.getElementById('resSnake').innerText = data.prediction?.class_name || "Unknown";
+            document.getElementById('resThai').innerText = data.info?.thai || "ไม่ทราบชื่อ";
+            document.getElementById('resConf').innerText = ((data.prediction?.confidence || 0) * 100).toFixed(1) + "%";
+            document.getElementById('resDanger').innerText = data.info?.danger || "Unknown";
+            document.getElementById('resAid').innerText = data.info?.aid || "-";
             
             const dangerEl = document.getElementById('resDanger');
-            if(data.info.danger === 'High') dangerEl.classList.add('danger-high');
+            if(data.info?.danger === 'High') dangerEl.classList.add('danger-high');
             else dangerEl.classList.remove('danger-high');
 
             els.resultBox.style.display = 'block';

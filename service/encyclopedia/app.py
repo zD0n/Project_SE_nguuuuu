@@ -28,10 +28,12 @@ def info(name):
       LIMIT 1
     """
     conn = get_conn()
-    with conn.cursor() as cur:
-        cur.execute(sql, (q, q, q))
-        row = cur.fetchone()
-    conn.close()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (q, q, q))
+            row = cur.fetchone()
+    finally:
+        conn.close()
 
     if not row:
         return jsonify({"error": "NOT_FOUND", "message": f"Snake '{name}' not found"}), 404
@@ -52,10 +54,12 @@ def search():
       LIMIT %s
     """
     conn = get_conn()
-    with conn.cursor() as cur:
-        cur.execute(sql, (like, like, like, like, limit))
-        rows = cur.fetchall()
-    conn.close()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (like, like, like, like, limit))
+            rows = cur.fetchall()
+    finally:
+        conn.close()
 
     return jsonify({"items": rows, "total": len(rows), "query": q}), 200
 

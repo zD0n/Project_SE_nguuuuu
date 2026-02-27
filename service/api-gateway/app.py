@@ -9,17 +9,17 @@ app = Flask(__name__)
 CORS(app)
 
 # URLs ของแต่ละ Service ตามโครงสร้างโปรเจกต์
-S2_URL = "http://localhost:5002/upload"
-S3_URL = "http://localhost:5001/predict"
-S4_URL = "http://localhost:5003/info"
-S5_URL = "http://localhost:5004/log"
+S2_URL = os.environ.get('S2_URL', 'http://image-storage:5002/upload')
+S3_URL = os.environ.get('S3_URL', 'http://ai-service:5001/predict')
+S4_URL = os.environ.get('S4_URL', 'http://encyclopedia:8000/info')
+S5_URL = os.environ.get('S5_URL', 'http://log-storage:3350/log')
 
 def send_log_background(data):
     """ส่ง Log ไปที่ S5 แบบเบื้องหลัง เพื่อเพิ่มความเร็วในการตอบสนอง"""
     try:
         requests.post(S5_URL, json=data, timeout=2)
-    except:
-        pass
+    except Exception as e:
+        print(f"Failed to send log: {e}")
 
 def call_service(url, files=None, method='POST'):
     """ฟังก์ชันกลางสำหรับติดต่อ Microservices อื่นๆ"""
@@ -32,6 +32,10 @@ def call_service(url, files=None, method='POST'):
     except Exception as e:
         print(f"Service Error at {url}: {e}")
         return None
+
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({"status": "ok"}), 200
 
 @app.route('/scan', methods=['POST'])
 def scan():
