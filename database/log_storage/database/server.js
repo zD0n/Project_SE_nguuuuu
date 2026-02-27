@@ -19,59 +19,28 @@ const db = mysql.createPool({
   port: process.env.DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
-  multipleStatements: true
+  multipleStatements: true,
+  charset: 'utf8mb4'
 })
 
 app.get("/health", async (req, res) => {
-  try {
-    res.status(200).json({ status: "Online" })
-  } catch (err) {
-    res.status(500).json({ status: "Error" })
-  }
-})
-
-app.get("/current-db", async (req, res) => {
-  res.json({ database: currentDatabase })
-})
-
-app.get("/tables", async (req, res) => {
-  const conn = await db.getConnection()
-  try {
-    await conn.query(`USE ${currentDatabase}`)
-    const [rows] = await conn.query("SHOW TABLES")
-
-    const tables = rows.map(row => Object.values(row)[0])
-
-    res.json({ tables })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  } finally {
-    conn.release()
-  }
+  res.status(200).json({ status: "Online" })
 })
 
 app.post("/log", async (req, res) => {
-  const { snake_found, confidence, image_url } = req.body
-  
-  if (!snake_found) {
-    return res.status(400).json({ error: "snake_found is required" })
-  }
-
+  const { id_mongo, id_snake, confi, snake_found, confidence } = req.body
   const conn = await db.getConnection()
-
   try {
     await conn.query(`USE ${currentDatabase}`)
-
-    const [result] = await conn.query(
-      "INSERT INTO log (snake_found, confidence, image_url, created_at) VALUES (?, ?, ?, NOW())",
-      [snake_found, confidence || null, image_url || null]
-    )
-
-    res.json({
-      result: "logged successfully",
-      id: result.insertId
-    })
-
+    
+    if (id_mongo && (id_snake || snake_found)) {
+      await conn.query(
+        "INSERT INTO feedback_log (id_mongo, id_snake, confi, time) VALUES (?, ?, ?, NOW())",
+        [id_mongo, id_snake || snake_found, confi || confidence]
+      )
+      return res.json({ result: "Logged to feedback_log successfully" })
+    }
+    res.status(400).json({ error: "Missing required fields" })
   } catch (err) {
     res.status(500).json({ error: err.message })
   } finally {
@@ -79,13 +48,19 @@ app.post("/log", async (req, res) => {
   }
 })
 
-app.get("/summary", async (req, res) => {
+app.post("/feedback", async (req, res) => {
+  const { id_mongo, feedback } = req.body
+  if (!id_mongo || !feedback) {
+    return res.status(400).json({ error: "Missing data" })
+  }
   const conn = await db.getConnection()
   try {
     await conn.query(`USE ${currentDatabase}`)
-    const [rows] = await conn.query("SELECT * FROM log ORDER BY created_at DESC LIMIT 100")
-
-    res.json({ logs: rows, count: rows.length })
+    const [result] = await conn.query(
+      "UPDATE feedback_log SET feedback = ? WHERE id_mongo = ?",
+      [feedback, id_mongo]
+    )
+    res.json({ result: "Feedback updated" })
   } catch (err) {
     res.status(500).json({ error: err.message })
   } finally {
@@ -94,5 +69,4 @@ app.get("/summary", async (req, res) => {
 })
 
 const PORT = process.env.PORT || 3350
-const HOST = process.env.HOST || "0.0.0.0"
-app.listen(PORT, HOST, () => console.log(`Server running on ${HOST}:${PORT}`))
+app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`))

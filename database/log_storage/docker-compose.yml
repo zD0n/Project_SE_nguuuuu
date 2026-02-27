@@ -36,6 +36,18 @@ services:
     networks:
       - snake-net
 
+  log_phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: log_phpmyadmin
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      - PMA_HOST=log-mysql
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    networks:
+      - snake-net
+
 networks:
   snake-net:
     name: snake-net
