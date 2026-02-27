@@ -45,6 +45,24 @@ SET
   first_aid_th = @aid;
 
 
+LOAD DATA INFILE '/var/lib/mysql-files/snakes_mild.csv'
+INTO TABLE snakes
+FIELDS TERMINATED BY ',' 
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(@sci, @thai, @grp, @symp, @hab, @aid)
+SET 
+  id = UUID(),
+  scientific_name = @sci,
+  name_en = @sci, 
+  name_th = @thai,
+  `group` = @grp,
+  symptoms_th = @symp,
+  habitat_th = @hab,
+  first_aid_th = @aid;
+
+
 LOAD DATA INFILE '/var/lib/mysql-files/snakes_poison.csv'
 INTO TABLE snakes
 FIELDS TERMINATED BY ',' 
