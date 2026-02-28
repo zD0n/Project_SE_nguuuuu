@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="static\logo.png">
     <title>Snake Guard AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -59,6 +60,20 @@
             background: #e8f8f5; border-left: 5px solid var(--primary);
             text-align: left; display: none; 
         }
+        .result-card-inner {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .result-info { flex: 1; }
+        .result-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            display: none;
+        }
         .danger-high { color: var(--danger); font-weight: bold; }
 
         .loader { display: none; width: 24px; height: 24px; border: 3px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: auto; }
@@ -107,21 +122,30 @@
     </button>
 
     <div class="result-card" id="resultBox">
-        <h3 id="resSnake" style="margin: 0 0 10px 0; color: #2c3e50;"></h3>
-        <div><b>ชื่อไทย:</b> <span id="resThai">-</span></div>
-        <div><b>ความมั่นใจของ AI:</b> <span id="resConf">-</span></div>
-        <div><b>ระดับอันตราย:</b> <span id="resDanger">-</span></div>
-        <div style="margin-top: 5px;"><b>ปฐมพยาบาล:</b> <span id="resAid">-</span></div>
-        <div style="margin-top: 5px;"><b>ลักษณะทางกายภาพ:</b> <span id="resMorphology">-</span></div>
-        <div id="resWarning" style="margin-top: 10px; color: var(--danger); font-weight: bold; display: none;"></div>
+        <div class="result-card-inner">
+            <div class="result-info">
+                <h3 id="resSnake" style="margin: 0 0 10px 0; color: #2c3e50;"></h3>
+                <p id="resTimestamp" style="color: #7f8c8d; font-size: 0.85rem; margin: 0 0 10px 0;"></p>
+                <div><b>ชื่อไทย:</b> <span id="resThai">-</span></div>
+                <div><b>ความมั่นใจของ AI:</b> <span id="resConf">-</span></div>
+                <div><b>ระดับอันตราย:</b> <span id="resDanger">-</span></div>
+                <div style="margin-top: 5px;"><b>ปฐมพยาบาล:</b> <span id="resAid">-</span></div>
+                <div style="margin-top: 5px;"><b>ลักษณะทางกายภาพ:</b> <span id="resMorphology">-</span></div>
+                <div id="resWarning" style="margin-top: 10px; color: var(--danger); font-weight: bold; display: none;"></div>
+            </div>
+            <img id="resSnakeImg" class="result-img" alt="Snake Image">
+        </div>
         
         <div id="feedbackSection" style="margin-top: 15px; display: none; border-top: 1px solid #ccc; padding-top: 15px;">
             <textarea id="feedbackText" rows="3" placeholder="AI ทายถูกไหม? หรือมีข้อเสนอแนะอะไรให้เว็บเราบ้าง?" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; resize: none;"></textarea>
             <button onclick="submitFeedback()" style="margin-top: 8px; padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer;">ส่งข้อเสนอแนะ</button>
         </div>
+
+        <button id="btnSaveCard" style="background: var(--primary); color: white; border: none; border-radius: 8px; padding: 12px 20px; font-size: 1rem; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onmouseover="this.style.boxShadow='0 4px 10px rgba(0,0,0,0.2)'" onmouseout="this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">💾 เซฟผลการสแกนเป็นรูปภาพ</button>
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

@@ -48,7 +48,7 @@ def transform_wiki_response(wiki_data):
     
     return {
         "thai": wiki_data.get("name_th", "ไม่ทราบชื่อ"),
-        "danger": wiki_data.get("group", "Unknown"),
+        "danger": wiki_data.get("venomous", wiki_data.get("group", "Unknown")),
         "aid": wiki_data.get("first_aid_th", "-"),
         "morphology": wiki_data.get("morphology", "-")
     }
@@ -74,13 +74,13 @@ def fetch_wiki_background(snake_name, mongo_id):
         print(f"Wiki fetch error: {e}")
         wiki_data = {}
 
-def call_service(url, files=None, method='POST', timeout=10):
+def call_service(url, files=None, method='POST', timeout=10, params=None):
     """ฟังก์ชันกลางสำหรับติดต่อ Microservices อื่นๆ"""
     try:
         if method == 'POST':
-            resp = requests.post(url, files=files, timeout=timeout)
+            resp = requests.post(url, files=files, params=params, timeout=timeout)
         else:
-            resp = requests.get(url, timeout=timeout)
+            resp = requests.get(url, params=params, timeout=timeout)
         return resp.json()
     except Exception as e:
         print(f"Service Error at {url}: {e}")
@@ -139,21 +139,26 @@ def scan():
     })
 
 @app.route('/wiki-info', methods=['GET'])
-def wiki_info():
-    snake_name = request.args.get('name', '').strip() 
+@app.route('/wiki-info/<path:snake_name>', methods=['GET'])
+def wiki_info(snake_name=None):
+    if snake_name:
+        input_name = snake_name.strip()
+    else:
+        input_name = request.args.get('name', '').strip()
     
-    if not snake_name:
+    if not input_name:
         return jsonify({"error": "name is required"}), 400
     
     try:
-        db_identifier = get_snake_identifier(snake_name)
-        # เรียก Encyclopedia โดยส่งเป็น Query ต่อไป
-        wiki_res = call_service(f"{S4_INFO_URL}", params={"name": db_identifier}, method='GET', timeout=SERVICE_TIMEOUT)
+        db_identifier = get_snake_identifier(input_name)
+        print(f"[wiki-info] Input: {input_name} -> DB Identifier: {db_identifier}", flush=True)
+        wiki_res = requests.get(f"{S4_INFO_URL}/{db_identifier}", timeout=SERVICE_TIMEOUT)
+        print(f"[wiki-info] Encyclopedia response: {wiki_res.status_code}", flush=True)
         
-        if not wiki_res or "error" in wiki_res:
+        if wiki_res.status_code != 200:
             return jsonify({"thai": "ไม่ทราบชื่อ", "danger": "Unknown"}), 404
             
-        return jsonify(transform_wiki_response(wiki_res))
+        return jsonify(transform_wiki_response(wiki_res.json()))
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500

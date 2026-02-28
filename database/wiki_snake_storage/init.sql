@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS snakes (
   short_name VARCHAR(60) NULL,
   scientific_name VARCHAR(160) NULL,
   `group` VARCHAR(60) NULL,        -- venomous / non_venomous
+  venomous VARCHAR(60) NULL,       -- ไม่มีพิษ / มีพิษ
   venom_type VARCHAR(255) NULL,     -- neurotoxic/hemotoxic/...
   symptoms_th TEXT NULL,
   habitat_th TEXT NULL,
@@ -41,6 +42,7 @@ SET
   name_en = @sci,
   name_th = @thai,
   `group` = @grp,
+  venomous = @venomous,
   venom_type = CONCAT_WS(', ', NULLIF(@venom0, ''), NULLIF(@venom1, '')),
   morphology = @morph,
   symptoms_th = @symp,
@@ -61,6 +63,7 @@ SET
   name_en = @sci,
   name_th = @thai,
   `group` = @grp,
+  venomous = @venomous,
   venom_type = CONCAT_WS(', ', NULLIF(@venom0, ''), NULLIF(@venom1, '')),
   morphology = @morph,
   symptoms_th = @symp,
@@ -75,13 +78,14 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\r\n'
 IGNORE 1 ROWS
-(@sci, @thai, @dummy1, @grp, @dummy2, @risk, @venom0, @venom1, @morph, @symp, @hab, @aid0, @aid1, @aid2, @aid3)
+(@sci, @thai, @dummy1, @grp, @venomous, @risk, @venom0, @venom1, @morph, @symp, @hab, @aid0, @aid1, @aid2, @aid3)
 SET 
   id = UUID(),
   scientific_name = @sci,
   name_en = @sci,
   name_th = @thai,
   `group` = @grp,
+  venomous = @venomous,
   venom_type = CONCAT_WS(', ', NULLIF(@venom0, '0'), NULLIF(@venom1, '0')),
   morphology = @morph,
   symptoms_th = @symp,

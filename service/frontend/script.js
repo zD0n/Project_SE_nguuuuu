@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle selection (when user picks from datalist)
         searchInput.addEventListener('change', handleSearchSelect);
     }
+    
+    // Save card button
+    const saveBtn = document.getElementById('btnSaveCard');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveCardAsImage);
+    }
 });
 
 async function handleSearchInput(e) {
@@ -100,16 +106,29 @@ async function handleSearchSelect(e) {
         document.getElementById('resMorphology').innerText = wikiData.morphology || "-";
         document.getElementById('resWarning').style.display = 'none';
         document.getElementById('feedbackSection').style.display = 'none';
+        document.getElementById('resSnakeImg').style.display = 'none';
+        document.getElementById('btnSaveCard').style.display = 'none';
         
         // Clear datalist
         const datalist = document.getElementById('snake-suggestions');
         if (datalist) datalist.innerHTML = '';
         
         const dangerEl = document.getElementById('resDanger');
-        if (wikiData.danger === 'High') dangerEl.classList.add('danger-high');
-        else dangerEl.classList.remove('danger-high');
+        const dangerText = wikiData.danger || "";
+        
+        if (dangerText.includes('ไม่มีพิษ')) {
+            dangerEl.style.color = '#28a745';
+            dangerEl.style.fontWeight = 'bold';
+        } else if (dangerText.includes('พิษ')) {
+            dangerEl.style.color = '#dc3545';
+            dangerEl.style.fontWeight = 'bold';
+        } else {
+            dangerEl.style.color = 'inherit';
+            dangerEl.style.fontWeight = 'normal';
+        }
         
         els.resultBox.style.display = 'block';
+        document.getElementById('resTimestamp').innerText = `ค้นหาเมื่อ: ${new Date().toLocaleString('th-TH')}`;
         currentMongoId = null;
     } catch (error) {
         console.error('Search select error:', error);
@@ -266,6 +285,10 @@ async function sendToGateway(bytes) {
             document.getElementById('resSnake').innerText = snakeName;
             document.getElementById('resConf').innerText = confidenceVal.toFixed(1) + "%";
             
+            const snakeImg = document.getElementById('resSnakeImg');
+            snakeImg.src = els.imgPreview.src;
+            snakeImg.style.display = 'block';
+            
             document.getElementById('resThai').innerText = "กำลังโหลด...";
             document.getElementById('resDanger').innerText = "กำลังโหลด...";
             document.getElementById('resAid').innerText = "กำลังโหลด...";
@@ -284,6 +307,8 @@ async function sendToGateway(bytes) {
             currentMongoId = mongoId;
             document.getElementById('feedbackSection').style.display = 'block';
             document.getElementById('feedbackText').value = '';
+            document.getElementById('btnSaveCard').style.display = 'block';
+            document.getElementById('resTimestamp').innerText = `สแกนเมื่อ: ${new Date().toLocaleString('th-TH')}`;
 
             els.resultBox.style.display = 'block';
             
@@ -354,7 +379,18 @@ async function loadWikiInfo(snakeIdentifier) {
         document.getElementById('resMorphology').innerText = wikiData.morphology || "-";
         
         const dangerEl = document.getElementById('resDanger');
-        if(wikiData.danger === 'High') dangerEl.classList.add('danger-high');
+        const dangerText = wikiData.danger || "";
+        
+        if (dangerText.includes('ไม่มีพิษ')) {
+            dangerEl.style.color = '#28a745';
+            dangerEl.style.fontWeight = 'bold';
+        } else if (dangerText.includes('พิษ')) {
+            dangerEl.style.color = '#dc3545';
+            dangerEl.style.fontWeight = 'bold';
+        } else {
+            dangerEl.style.color = 'inherit';
+            dangerEl.style.fontWeight = 'normal';
+        }
         
     } catch (error) {
         console.error("Wiki load error:", error);
@@ -362,5 +398,42 @@ async function loadWikiInfo(snakeIdentifier) {
         document.getElementById('resDanger').innerText = "-";
         document.getElementById('resAid').innerText = "-";
         document.getElementById('resMorphology').innerText = "-";
+    }
+}
+
+async function saveCardAsImage() {
+    const resultBox = document.getElementById('resultBox');
+    const saveBtn = document.getElementById('btnSaveCard');
+    const feedbackSection = document.getElementById('feedbackSection');
+    const snakeName = document.getElementById('resSnake').innerText;
+    
+    if (!resultBox || !snakeName) {
+        return alert("ไม่พบผลการสแกน");
+    }
+    
+    try {
+        saveBtn.style.display = 'none';
+        feedbackSection.style.display = 'none';
+        
+        const canvas = await html2canvas(resultBox, {
+            scale: 2,
+            useCORS: true
+        });
+        
+        const dataUrl = canvas.toDataURL('image/png');
+        
+        const link = document.createElement('a');
+        link.download = `SnakeGuard_${snakeName}.png`;
+        link.href = dataUrl;
+        link.click();
+        
+    } catch (error) {
+        console.error('Save image error:', error);
+        alert("เกิดข้อผิดพลาดในการบันทึกรูปภาพ: " + error.message);
+    } finally {
+        saveBtn.style.display = 'block';
+        if (currentMongoId) {
+            feedbackSection.style.display = 'block';
+        }
     }
 }
