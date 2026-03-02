@@ -36,7 +36,7 @@ services:
 # เรียกใช้ Network กลางจากไฟล์ Root
 networks:
   snake-net:
-    external: true
+    name: snake-net
 
 volumes:
   wiki_mysql_data:

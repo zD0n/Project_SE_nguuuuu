@@ -51,7 +51,6 @@ services:
 networks:
   snake-net:
     name: snake-net
-    external: true
 
 volumes:
   log_mysql_data:

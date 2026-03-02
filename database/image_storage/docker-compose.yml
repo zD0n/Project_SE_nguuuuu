@@ -31,7 +31,6 @@ services:
 networks:
   snake-net:
     name: snake-net
-    external: true
 
 volumes:
   mongo_data:

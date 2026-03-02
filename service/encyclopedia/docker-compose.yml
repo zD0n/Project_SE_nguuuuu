@@ -19,4 +19,3 @@ services:
 networks:
   snake-net:
     name: snake-net
-    external: true

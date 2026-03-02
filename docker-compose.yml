@@ -1,3 +1,8 @@
+networks:
+  snake-net:
+    name: snake-net
+    driver: bridge
+
 include:
   - path: service/api-gateway/docker-compose.yml
   - path: service/encyclopedia/docker-compose.yml
@@ -6,7 +11,3 @@ include:
   - path: database/image_storage/docker-compose.yml
   - path: database/log_storage/docker-compose.yml
   - path: database/wiki_snake_storage/docker-compose.yml
-networks:
-  snake-net:
-    name: snake-net
-    driver: bridge
