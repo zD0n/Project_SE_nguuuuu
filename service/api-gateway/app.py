@@ -23,21 +23,21 @@ AI_TIMEOUT = 10
 # Map AI common names to Wiki database identifiers
 COMMON_TO_SCIENTIFIC = {
     "Vine Snake": "Ahaetulla nasuta",
-    "Whip Snake": "Ahaetulla pulverulenta",
+    "Whip Snake": "Ahaetulla prasina",
     "Krait": "Bungarus fasciatus",
     "Golden Tree": "Chrysopelea ornata",
-    "Russell Viper": "Daboia russelii",
+    "Russell Viper": "Daboia siamensis",
     "Painted Bronzeback": "Dendrelaphis pictus",
-    "Red-tailed Racer": "Gonyosoma albicarcen",
+    "Red-tailed Racer": "Gonyosoma coeruleum",
     "Sea Krait": "Laticauda colubrina",
     "Wolf Snake": "Lycodon aulicus",
     "Monocled Cobra": "Naja kaouthia",
     "King Cobra": "Ophiophagus hannah",
-    "Protobothrops": "Protobothrops kelom",
+    "Protobothrops": "Protobothrops kelomohy" ,
     "Mock Viper": "Psammodynastes pulverulentus",
     "Python": "Python bivittatus",
     "Red-necked": "Rhabdophis subminiatus",
-    "Bamboo Viper": "Trimeresurus albus",
+    "Bamboo Viper": "Trimeresurus albolabris",
     "Checkered Keelback": "Xenochrophis flavipunctatus"
 }
 
