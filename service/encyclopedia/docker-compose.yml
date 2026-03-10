@@ -1,0 +1,21 @@
+services:
+  encyclopedia:
+    build: .
+    container_name: encyclopedia
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=wiki-mysql
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=wiki_snake_storage
+      - DB_PORT=3306
+    depends_on:
+      wiki-mysql:
+        condition: service_started
+    networks:
+      - snake-net
+
+networks:
+  snake-net:
+    name: snake-net

@@ -1,26 +1,42 @@
 services:
-  db:
+  wiki-mysql:
     image: mysql:8.0
-    container_name: snake_db
+    container_name: wiki-mysql
     command: --secure-file-priv="" --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
       MYSQL_DATABASE: wiki_snake_storage
+      MYSQL_USER: ${DB_USER:-wiki}
+      MYSQL_PASSWORD: ${DB_PASS:-wiki}
     ports:
-      - "3306:3306"
+      - "3308:3306"
     volumes:
+      - wiki_mysql_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/1-init.sql
       - ./seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
       - ./dataset:/var/lib/mysql-files/
+    networks:
+      - snake-net
 
+  # ของแถมจากเพื่อน: หน้าเว็บจัดการ Database (แต่ผมย้ายไปพอร์ต 8081 จะได้ไม่ชน Frontend)
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: snake_phpmyadmin
     restart: always
     ports:
-      - "8080:80"
+      - "8081:80" 
     environment:
-      - PMA_HOST=db
-      - MYSQL_ROOT_PASSWORD=root_password
+      - PMA_HOST=wiki-mysql
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
     depends_on:
-      - db
+      - wiki-mysql
+    networks:
+      - snake-net
+
+# เรียกใช้ Network กลางจากไฟล์ Root
+networks:
+  snake-net:
+    name: snake-net
+
+volumes:
+  wiki_mysql_data:

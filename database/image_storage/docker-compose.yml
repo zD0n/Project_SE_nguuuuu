@@ -1,16 +1,20 @@
 services:
   mongo:
     image: mongo:7
+    container_name: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - mongo_data:/data/db
     ports:
-      - ${MONGO_PORT}
+      - "${MONGO_PORT}:27017"
+    networks:
+      - snake-net
 
-  api:
+  image-storage:
     build: ./gate-way-img
+    container_name: image-storage
     env_file:
       - .env
     environment:
@@ -18,7 +22,16 @@ services:
     depends_on:
       - mongo
     ports:
-      - ${API_MONGO_PORT}
+      - "5002:5002"
+    volumes:
+      - image_uploads:/app/uploads
+    networks:
+      - snake-net
+
+networks:
+  snake-net:
+    name: snake-net
 
 volumes:
   mongo_data:
+  image_uploads:

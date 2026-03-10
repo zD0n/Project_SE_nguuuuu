@@ -1,0 +1,17 @@
+services:
+  api-gateway:
+    build: .
+    container_name: api-gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - S2_URL=http://image-storage:5002/upload
+      - S3_URL=http://ai-service:5001/predict
+      - S4_URL=http://encyclopedia:8000/info
+      - S5_URL=http://log-storage:3350/log
+    networks:
+      - snake-net
+
+networks:
+  snake-net:
+    name: snake-net

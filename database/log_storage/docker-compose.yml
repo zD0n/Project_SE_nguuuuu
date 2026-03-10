@@ -1,24 +1,24 @@
-version: "3.9"
-
 services:
   mysql:
     image: mysql:8.0
-    container_name: mysql_db
+    container_name: log-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: myrootpassword
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: log_database
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: mypassword
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - log_mysql_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - snake-net
 
-  api:
+  log-storage:
     build: ./database
-    container_name: node_api
+    container_name: log-storage
     restart: always
     ports:
       - "3350:3350"
@@ -26,8 +26,31 @@ services:
       - mysql
     env_file:
       - ./database/.env
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASS}
+      - DB_NAME=log_database
+      - DB_PORT=3306
     command: npm start
-    
+    networks:
+      - snake-net
+
+  log_phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: log_phpmyadmin
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      - PMA_HOST=log-mysql
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    networks:
+      - snake-net
+
+networks:
+  snake-net:
+    name: snake-net
+
 volumes:
-  mysql_data:
-  
+  log_mysql_data:

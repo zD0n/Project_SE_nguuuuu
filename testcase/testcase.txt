@@ -1,0 +1,162 @@
+==============================
+SNAKE SCAN SYSTEM - TEST CASES
+==============================
+
+---------------------------------
+1. API GATEWAY SERVICE
+---------------------------------
+
+GW-01: POST /scan with image bytes
+Expected: 200 OK + prediction JSON
+
+GW-02: POST /scan with image URL
+Expected: 200 OK + prediction JSON
+
+GW-03: Confidence < 70%
+Expected: Return "Unknown"
+
+GW-04: Confidence >= 70%
+Expected: Return snake name + confidence
+
+GW-05: Missing image input
+Expected: 400 Bad Request
+
+GW-06: AI service timeout
+Expected: 503 Service Unavailable
+
+GW-07: S3 upload failure
+Expected: 500 Internal Server Error
+
+GW-08: Rate limit exceeded
+Expected: 429 Too Many Requests
+
+GW-09: Log service failure
+Expected: Main response still 200
+
+
+---------------------------------
+2. IMAGE STORAGE SERVICE
+---------------------------------
+
+IMG-01: Upload image successfully
+Expected: Return image_id
+
+IMG-02: Duplicate image upload
+Expected: No crash, return new ID or handle properly
+
+IMG-03: Database connection failure
+Expected: 500 Error
+
+IMG-04: GET /health
+Expected: Status OK
+
+IMG-05: Database health check
+Expected: DB connection verified
+
+
+---------------------------------
+3. AI INFERENCE SERVICE
+---------------------------------
+
+AI-01: Model loads successfully
+Expected: Model ready
+
+AI-02: Receive image bytes
+Expected: Convert to tensor
+
+AI-03: Invalid image format
+Expected: 400 Error
+
+AI-04: Valid image inference
+Expected: JSON with label + confidence + bbox
+
+AI-05: Model returns empty result
+Expected: Handle gracefully
+
+
+---------------------------------
+4. ENCYCLOPEDIA SERVICE
+---------------------------------
+
+ENC-01: GET /info/<name> valid
+Expected: 200 + snake information
+
+ENC-02: GET /info/<name> invalid
+Expected: 404 Not Found
+
+ENC-03: GET /search?q=name
+Expected: Return matching list
+
+ENC-04: SQL injection attempt
+Expected: Prevented
+
+
+---------------------------------
+5. LOGS DATABASE SERVICE
+---------------------------------
+
+LOG-01: POST /log valid data
+Expected: Log inserted successfully
+
+LOG-02: POST /log invalid data
+Expected: 400 Error
+
+LOG-03: GET /stats
+Expected: Return database status
+
+LOG-04: GET /summary
+Expected: Return aggregated log data
+
+LOG-05: Submit user feedback
+Expected: Feedback saved
+
+
+---------------------------------
+6. DOCKER / DEPLOYMENT
+---------------------------------
+
+DEV-01: Docker build success
+Expected: Image builds without error
+
+DEV-02: docker-compose up
+Expected: All services running
+
+DEV-03: Restart container
+Expected: Data persists
+
+DEV-04: Service dependency order
+Expected: Services start correctly
+
+
+---------------------------------
+7. FRONTEND / UI
+---------------------------------
+
+FE-01: Upload image
+Expected: Request sent to Gateway
+
+FE-02: Loading animation
+Expected: Visible during processing
+
+FE-03: Display result
+Expected: Show name + confidence
+
+FE-04: First aid modal
+Expected: Opens and closes correctly
+
+FE-05: Mobile responsive
+Expected: Layout adjusts properly
+
+
+---------------------------------
+8. END-TO-END TEST
+---------------------------------
+
+E2E-01: Full scan flow
+User uploads snake image
+AI confidence >= 70%
+Encyclopedia info retrieved
+Log saved
+UI displays correct result
+
+Expected: Complete successful flow
