@@ -51,7 +51,7 @@ async function handleSearchInput(e) {
     }
     
     try {
-        const response = await fetch(`http://localhost:5000/search-suggestions?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`https://snakeguard888.online/search-suggestions?q=${encodeURIComponent(query)}`);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
@@ -85,7 +85,7 @@ async function handleSearchSelect(e) {
     }
     
     try {
-        const response = await fetch(`http://localhost:5000/wiki-info?name=${encodeURIComponent(selectedName)}`);
+        const response = await fetch(`https://snakeguard888.online/wiki-info?name=${encodeURIComponent(selectedName)}`);
         
         if (response.status === 404) {
             alert('ไม่พบข้อมูลประวัติงู โปรดเลือกจากรายชื่อที่แนะนำ');
@@ -252,7 +252,7 @@ async function handleSmartScan() {
 // 5. ส่งข้อมูลไป API Gateway
 async function sendToGateway(bytes) {
     // แบบที่ 1: สำหรับทดสอบบนคอมพิวเตอร์เครื่องนี้เท่านั้น (Localhost)
-    const API_URL = 'http://localhost:5000/scan';
+    const API_URL = 'https://snakeguard888.online/scan';
 
     // แบบที่ 2: สำหรับทดสอบบนมือถือ (ต้องใช้ IP เครื่องคอมฯ)
     // const API_URL = 'http://10.62.122.50:5000/scan'; 
@@ -337,7 +337,7 @@ async function submitFeedback() {
         return alert("ไม่พบ mongo_id กรุณาสแกนใหม่อีกครั้ง");
     }
     
-    const API_URL = 'http://localhost:5000/feedback';
+    const API_URL = 'https://snakeguard888.online/feedback';
     
     try {
         const response = await fetch(API_URL, {
@@ -362,7 +362,7 @@ async function submitFeedback() {
 }
 
 async function loadWikiInfo(snakeIdentifier) {
-    const GATEWAY_URL = 'http://localhost:5000';
+    const GATEWAY_URL = 'https://snakeguard888.online';
     
     try {
         const wikiResponse = await fetch(`${GATEWAY_URL}/wiki-info/${encodeURIComponent(snakeIdentifier)}`);

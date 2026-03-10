@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="static\logo.png">
+    <link rel="icon" type="image/png" href="static/logo.png">
     <title>Snake Guard AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -55,25 +55,74 @@
         .btn-scan:disabled { background: #95a5a6; cursor: not-allowed; }
         .btn-scan:hover:not(:disabled) { background: var(--primary); transform: translateY(-2px); }
 
+        /* Result Card - Fixed Opacity & White Background */
         .result-card { 
-            margin-top: 20px; padding: 20px; border-radius: 10px; 
-            background: #e8f8f5; border-left: 5px solid var(--primary);
-            text-align: left; display: none; 
+            margin-top: 20px; 
+            padding: 0;
+            border-radius: 16px; 
+            background: #ffffff !important;
+            border: 1px solid #d1d8e0;
+            text-align: left; 
+            display: none; 
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            opacity: 1 !important;
         }
+
+        /* Desktop: Row Layout - Image on Right */
         .result-card-inner {
             display: flex;
-            gap: 15px;
+            flex-direction: row;
+            gap: 20px;
             align-items: flex-start;
         }
-        .result-info { flex: 1; }
-        .result-img {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid var(--primary);
-            display: none;
+
+        .result-info { 
+            flex: 1; 
+            padding: 20px;
+            color: #1a1a1a;
         }
+        
+        .result-info div {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: #1a1a1a;
+        }
+        
+        .result-info b {
+            color: #2c3e50;
+        }
+
+        .result-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 3px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+
+        /* Mobile: Column Layout - Image on TOP (< 600px) */
+        @media (max-width: 600px) {
+            .result-card-inner {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .result-img {
+                width: 100%;
+                height: 250px;
+                border-radius: 16px 16px 0 0;
+                border: none;
+                border-bottom: 3px solid var(--primary);
+            }
+            
+            .result-info {
+                padding: 20px;
+            }
+        }
+
         .danger-high { color: var(--danger); font-weight: bold; }
 
         .loader { display: none; width: 24px; height: 24px; border: 3px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: auto; }
@@ -123,6 +172,9 @@
 
     <div class="result-card" id="resultBox">
         <div class="result-card-inner">
+            <!-- IMAGE FIRST (on mobile it will be on top) -->
+            <img id="resSnakeImg" class="result-img" alt="Snake Image">
+            
             <div class="result-info">
                 <h3 id="resSnake" style="margin: 0 0 10px 0; color: #2c3e50;"></h3>
                 <p id="resTimestamp" style="color: #7f8c8d; font-size: 0.85rem; margin: 0 0 10px 0;"></p>
@@ -133,7 +185,6 @@
                 <div style="margin-top: 5px;"><b>ลักษณะทางกายภาพ:</b> <span id="resMorphology">-</span></div>
                 <div id="resWarning" style="margin-top: 10px; color: var(--danger); font-weight: bold; display: none;"></div>
             </div>
-            <img id="resSnakeImg" class="result-img" alt="Snake Image">
         </div>
         
         <div id="feedbackSection" style="margin-top: 15px; display: none; border-top: 1px solid #ccc; padding-top: 15px;">
