@@ -4,10 +4,33 @@ import threading
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["100 per minute"]
+)
 CORS(app)
+@app.errorhandler(HTTPException)
+def handle_http_exception(e):
+    return jsonify({
+        "status": "error",
+        "message": e.description,
+        "code": e.code
+    }), e.code
 
+
+@app.errorhandler(Exception)
+def handle_general_exception(e):
+    print(f"Unhandled Error: {e}")
+    return jsonify({
+        "status": "error",
+        "message": "Internal Server Error"
+    }), 500
 # URLs ของแต่ละ Service ตามโครงสร้างโปรเจกต์
 S2_URL = os.environ.get('S2_URL', 'http://image-storage:5002/upload')
 S3_URL = os.environ.get('S3_URL', 'http://ai-service:5001/predict')
@@ -22,24 +45,24 @@ AI_TIMEOUT = 10
 
 # Map AI common names to Wiki database identifiers
 COMMON_TO_SCIENTIFIC = {
-    "Vine Snake": "Ahaetulla nasuta",
-    "Whip Snake": "Ahaetulla prasina",
-    "Krait": "Bungarus fasciatus",
-    "Golden Tree": "Chrysopelea ornata",
-    "Russell Viper": "Daboia siamensis",
-    "Painted Bronzeback": "Dendrelaphis pictus",
-    "Red-tailed Racer": "Gonyosoma coeruleum",
-    "Sea Krait": "Laticauda colubrina",
-    "Wolf Snake": "Lycodon aulicus",
-    "Monocled Cobra": "Naja kaouthia",
-    "King Cobra": "Ophiophagus hannah",
-    "Protobothrops": "Protobothrops kelomohy" ,
-    "Mock Viper": "Psammodynastes pulverulentus",
-    "Python": "Python bivittatus",
-    "Red-necked": "Rhabdophis subminiatus",
-    "Bamboo Viper": "Trimeresurus albolabris",
-    "Checkered Keelback": "Xenochrophis flavipunctatus"
-}
+        "Vine Snake": "Ahaetulla nasuta",
+        "Whip Snake": "Ahaetulla prasina",
+        "Krait": "Bungarus fasciatus",
+        "Golden Tree": "Chrysopelea ornata",
+        "Russell Viper": "Daboia siamensis",
+        "Painted Bronzeback": "Dendrelaphis pictus",
+        "Red-tailed Racer": "Gonyosoma coeruleum",
+        "Sea Krait": "Laticauda colubrina",
+        "Wolf Snake": "Lycodon aulicus",
+        "Monocled Cobra": "Naja kaouthia",
+        "King Cobra": "Ophiophagus hannah",
+        "Protobothrops": "Protobothrops kelomohy" ,
+        "Mock Viper": "Psammodynastes pulverulentus",
+        "Python": "Python bivittatus",
+        "Red-necked": "Rhabdophis subminiatus",
+        "Bamboo Viper": "Trimeresurus albolabris",
+        "Checkered Keelback": "Xenochrophis flavipunctatus"
+    }
 
 def transform_wiki_response(wiki_data):
     """Transform Wiki response to match Frontend expectations"""
@@ -75,15 +98,28 @@ def fetch_wiki_background(snake_name, mongo_id):
         wiki_data = {}
 
 def call_service(url, files=None, method='POST', timeout=10, params=None):
-    """ฟังก์ชันกลางสำหรับติดต่อ Microservices อื่นๆ"""
     try:
         if method == 'POST':
             resp = requests.post(url, files=files, params=params, timeout=timeout)
         else:
             resp = requests.get(url, params=params, timeout=timeout)
+        resp.raise_for_status()
         return resp.json()
+
+    except requests.exceptions.Timeout:
+        print(f"Timeout calling {url}")
+        return None
+
+    except requests.exceptions.ConnectionError:
+        print(f"Connection error calling {url}")
+        return None
+
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP error {e} from {url}")
+        return None
+
     except Exception as e:
-        print(f"Service Error at {url}: {e}")
+        print(f"Unexpected error calling {url}: {e}")
         return None
 
 @app.route('/health', methods=['GET'])
@@ -91,6 +127,7 @@ def health():
     return jsonify({"status": "ok"}), 200
 
 @app.route('/scan', methods=['POST'])
+@limiter.limit("10 per minute")
 def scan():
     img_bytes = request.data 
     
@@ -140,6 +177,7 @@ def scan():
 
 @app.route('/wiki-info', methods=['GET'])
 @app.route('/wiki-info/<path:snake_name>', methods=['GET'])
+@limiter.limit("60 per minute")
 def wiki_info(snake_name=None):
     if snake_name:
         input_name = snake_name.strip()
@@ -164,6 +202,7 @@ def wiki_info(snake_name=None):
         return jsonify({"error": str(e)}), 500
 
 @app.route('/search-suggestions', methods=['GET'])
+@limiter.limit("30 per minute")
 def search_suggestions():
     q = request.args.get("q", "").strip()
     
@@ -185,6 +224,7 @@ def search_suggestions():
         return jsonify({"suggestions": []}), 200
 
 @app.route('/feedback', methods=['POST'])
+@limiter.limit("20 per minute")
 def feedback():
     data = request.get_json()
     
